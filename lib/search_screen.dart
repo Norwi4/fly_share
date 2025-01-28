@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'theme_provider.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -56,7 +58,7 @@ class _SearchScreenState extends State<SearchScreen> {
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
 
-    String currentLocation = "${placemarks[0].locality ?? ''}, ${placemarks[0].country ?? ''}".trim();
+    String currentLocation = (placemarks[0].locality ?? '').trim();
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('cached_location', currentLocation);
@@ -68,23 +70,25 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-      ),
       body: Container(
-        color: Colors.black, // Темный фон для всего приложения
+        color: themeProvider.isDarkMode ? Colors.black : Colors.white, // Фон в зависимости от темы
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            SizedBox(height: 80),
             Container(
-              child: Text("Доставим все", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),)
-
+              child: Text(
+                "Доставим все",
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: themeProvider.isDarkMode ? Colors.white : Colors.black),
+              ),
             ),
             SizedBox(height: 20),
             Container(
               decoration: BoxDecoration(
-                color: Colors.grey[800], // Светлее фон для блока ввода
+                color: themeProvider.isDarkMode ? Colors.grey[800] : Colors.blue, // Цвет фона блока ввода
                 borderRadius: BorderRadius.circular(8.0),
               ),
               padding: const EdgeInsets.all(16.0),
@@ -96,9 +100,9 @@ class _SearchScreenState extends State<SearchScreen> {
                       hintText: 'Откуда',
                       border: OutlineInputBorder(),
                       filled: true,
-                      fillColor: Colors.grey[700], // Фон для текстового поля
+                      fillColor: themeProvider.isDarkMode ? Colors.grey[700] : Colors.white, // Фон для текстового поля
                     ),
-                    style: TextStyle(color: Colors.white), // Цвет текста
+                    style: TextStyle(color: themeProvider.isDarkMode ? Colors.white : Colors.black), // Цвет текста
                   ),
                   SizedBox(height: 20),
                   TextField(
@@ -107,9 +111,9 @@ class _SearchScreenState extends State<SearchScreen> {
                       hintText: 'Куда',
                       border: OutlineInputBorder(),
                       filled: true,
-                      fillColor: Colors.grey[700], // Фон для текстового поля
+                      fillColor: themeProvider.isDarkMode ? Colors.grey[700] : Colors.white, // Фон для текстового поля
                     ),
-                    style: TextStyle(color: Colors.white), // Цвет текста
+                    style: TextStyle(color: themeProvider.isDarkMode ? Colors.white : Colors.black), // Цвет текста
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
@@ -125,7 +129,7 @@ class _SearchScreenState extends State<SearchScreen> {
             SizedBox(height: 20),
             Container(
               decoration: BoxDecoration(
-                color: Colors.grey[800], // Светлее фон для блока популярных маршрутов
+                color: themeProvider.isDarkMode ? Colors.grey[800] : Colors.blue, // Цвет фона блока популярных маршрутов
                 borderRadius: BorderRadius.circular(8.0),
               ),
               padding: const EdgeInsets.all(16.0),
@@ -135,7 +139,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   Text(
                     'Популярные маршруты',
                     style:
-                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white), // Цвет заголовка
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: themeProvider.isDarkMode ? Colors.white : Colors.black), // Цвет заголовка
                   ),
                   SizedBox(height: 10),
                   Container(
@@ -146,28 +150,30 @@ class _SearchScreenState extends State<SearchScreen> {
                       itemBuilder: (context, index) {
                         return Container(
                           width: 100, // Ширина каждого квадрата
-                          margin: EdgeInsets.symmetric(horizontal: 8.0),
-                          decoration: BoxDecoration(
-                            color: Colors.blueGrey,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: ClipRRect(
-                                  borderRadius:
-                                  BorderRadius.circular(8.0), // Закругление углов изображения
-                                  child:
-                                  Image.network('https://via.placeholder.com/100', fit: BoxFit.cover),
-                                ),
-                              ),
-                              SizedBox(height: 5),
-                              Text(popularDestinations[index],
-                                  style:
-                                  TextStyle(color: Colors.white)), // Цвет текста города под квадратом
-                            ],
-                          ),
+                          margin:
+                          EdgeInsets.symmetric(horizontal: 8.0),
+                          decoration:
+                          BoxDecoration(color:
+                          themeProvider.isDarkMode ? Colors.blueGrey : Colors.lightBlueAccent,
+                              borderRadius:
+                              BorderRadius.circular(8.0)),
+                          child:
+                          Column(mainAxisAlignment:
+                          MainAxisAlignment.center,
+                              children:[
+                                Expanded(child:
+                                ClipRRect(borderRadius:
+                                BorderRadius.circular(8.0),
+                                    child:
+                                    Image.network('https://via.placeholder.com/100', fit:
+                                    BoxFit.cover))),
+                                SizedBox(height:
+                                5),
+                                Text(popularDestinations[index],
+                                    style:
+                                    TextStyle(color:
+                                    Colors.white)), // Цвет текста города под квадратом
+                              ]),
                         );
                       },
                     ),
