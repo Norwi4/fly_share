@@ -154,7 +154,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           EdgeInsets.symmetric(horizontal: 8.0),
                           decoration:
                           BoxDecoration(color:
-                          themeProvider.isDarkMode ? Colors.blueGrey : Colors.lightBlueAccent,
+                          themeProvider.isDarkMode ? Colors.grey[800] : Colors.blue, // иконки
                               borderRadius:
                               BorderRadius.circular(8.0)),
                           child:
@@ -165,7 +165,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 ClipRRect(borderRadius:
                                 BorderRadius.circular(8.0),
                                     child:
-                                    Image.network('https://via.placeholder.com/100', fit:
+                                    Image.network('https://yt3.ggpht.com/ytc/AKedOLS7Nzy4zKW-CoHoGHk3y1_lKxJwGAJ-tu_Wpf357Q=s900-c-k-c0x00ffffff-no-rj', fit:
                                     BoxFit.cover))),
                                 SizedBox(height:
                                 5),
