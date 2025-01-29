@@ -21,7 +21,7 @@ class ThemeProvider with ChangeNotifier {
   Future<void> _loadTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _isDarkMode = prefs.getBool('isDarkMode') ?? false; // Загружаем сохраненное состояние
-    notifyListeners();
+    notifyListeners(); // Уведомляем слушателей об изменении
   }
 
   Future<void> _saveTheme() async {

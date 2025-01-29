@@ -1,6 +1,7 @@
+import 'dart:convert'; // Импортируем для работы с JSON
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:http/http.dart' as http; // Импортируем пакет http
 import 'home_screen.dart';
 
 class CodeVerificationScreen extends StatefulWidget {
@@ -23,7 +24,32 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
 
     // Эмулируем успешную верификацию кода
     if (code == "123456") { // Здесь вы можете использовать любой код для тестирования
-      final token = 'token_for_${widget.phone}'; // Создаем токен на основе номера телефона
+      await _login(); // Выполняем запрос на вход
+    } else {
+      // Обработка неверного кода
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Неверный код')),
+      );
+    }
+  }
+
+  Future<void> _login() async {
+    final url = Uri.parse('http://212.109.196.24:5045/api/Accounts/login');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: '{"email": "babay@gmail.com", "password": "testtestT1!"}', // Ваши данные для входа
+    );
+
+    if (response.statusCode == 200) {
+      // Если сервер возвращает код 200, значит, запрос успешен
+      final Map<String, dynamic> jsonResponse = jsonDecode(response.body); // Парсим ответ
+
+      // Извлекаем токен из ответа
+      final token = jsonResponse['token'];
+
+      // Выводим токен в консоль
+      print('Token: $token');
 
       // Сохранение токена в SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -35,13 +61,12 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
             (Route<dynamic> route) => false,
       );
     } else {
-      // Обработка неверного кода
+      // Обработка ошибки при входе
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Неверный код')),
+        SnackBar(content: Text('Ошибка при входе: ${response.reasonPhrase}')),
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {

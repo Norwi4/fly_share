@@ -19,31 +19,32 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Профиль'),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('Ваш профиль'),
-          SwitchListTile(
-            title: Text('Темная тема'),
-            value: themeProvider.isDarkMode,
-            onChanged: (value) {
-              themeProvider.toggleTheme(); // Переключаем тему
-              // Остаемся на текущем экране
-            },
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Профиль'),
           ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () => _logout(context),
-            child: Text('Выйти из аккаунта'),
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Ваш профиль'),
+              SwitchListTile(
+                title: Text('Темная тема'),
+                value: themeProvider.isDarkMode,
+                onChanged: (value) {
+                  themeProvider.toggleTheme(); // Переключаем тему
+                },
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => _logout(context),
+                child: Text('Выйти из аккаунта'),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
