@@ -5,7 +5,6 @@ import 'theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatelessWidget {
-
   Future<void> _logout(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('token'); // Удаляем токен
@@ -34,18 +33,17 @@ class ProfileScreen extends StatelessWidget {
             title: Text('Темная тема'),
             value: themeProvider.isDarkMode,
             onChanged: (value) {
-              themeProvider.toggleTheme();
+              themeProvider.toggleTheme(); // Переключаем тему
+              // Остаемся на текущем экране
             },
           ),
           SizedBox(height: 20),
           ElevatedButton(
             onPressed: () => _logout(context),
             child: Text('Выйти из аккаунта'),
-
           ),
         ],
       ),
     );
   }
 }
-
