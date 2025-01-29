@@ -111,7 +111,6 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-
     return Scaffold(
       body: Container(
         color: themeProvider.isDarkMode ? Colors.black : Colors.white,
@@ -233,19 +232,22 @@ class _SearchScreenState extends State<SearchScreen> {
                             Column(mainAxisAlignment:
                             MainAxisAlignment.center,
                                 children:[
-                                  Expanded(child:
-                                  ClipRRect(borderRadius:
-                                  BorderRadius.circular(8.0),
-                                      child:
-                                      Image(image:
-                                      avatarImage, fit:
-                                      BoxFit.cover))),
+                                  CircleAvatar(
+                                    backgroundImage:
+                                    avatarImage,
+                                    radius:
+                                    25, // Радиус аватара для создания круглого изображения
+                                  ),
                                   SizedBox(height:
                                   5),
-                                  Text('${order['from']} - ${order['to']}',
+                                  Text('${order['from']} - ',
                                       style:
                                       TextStyle(color:
-                                      Colors.white)), // Цвет текста маршрута
+                                      Colors.white)),
+                                  Text('${order['to']}',
+                                      style:
+                                      TextStyle(color:
+                                      Colors.white)),
                                   Text(order['name'],
                                       style:
                                       TextStyle(color:
