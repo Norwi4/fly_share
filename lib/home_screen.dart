@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:untitled2/screens/chat_list_screen.dart'; // Импорт экрана чатов
 import 'search_screen.dart';
 import 'publish_screen.dart';
 import 'trips_screen.dart';
-import 'chats_screen.dart';
 import 'profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
     SearchScreen(),
     PublishScreen(),
     TripsScreen(),
-    ChatsScreen(),
+    ChatListScreen(), // Экран чатов
     ProfileScreen(),
   ];
 
@@ -61,8 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.black, // Цвет фона нижнего меню
         onTap: _onItemTapped,
       ),
-
     );
   }
 }
-
