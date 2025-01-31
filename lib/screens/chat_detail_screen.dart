@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../blocs/message_bloc.dart';
 import '../models/message.dart';
 import '../services/api_service.dart';
@@ -16,20 +17,30 @@ class ChatDetailScreen extends StatefulWidget {
 
 class _ChatDetailScreenState extends State<ChatDetailScreen> {
   final ScrollController _scrollController = ScrollController();
+  String? _currentUserId;
 
   @override
   void initState() {
     super.initState();
-    // Прокручиваем список вниз после загрузки сообщений
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
+    _loadCurrentUserId();
+  }
+
+  Future<void> _loadCurrentUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _currentUserId = prefs.getString('userId'); // Получаем userId
     });
+  }
+
+  // Метод для прокрутки вниз
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   @override
@@ -39,42 +50,41 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       appBar: AppBar(
         title: Text('Чат'),
       ),
-      body: BlocProvider(
-        create: (context) => MessageBloc(
-          apiService: ApiService(),
-          chatId: widget.chatId,
-        )..loadMessages(),
-        child: Column(
-          children: [
-            Expanded(
-              child: BlocBuilder<MessageBloc, List<Message>>(
-                builder: (context, messages) {
-                  print('Обновление списка сообщений: ${messages.length} шт.');
+      body: SafeArea(
+        child: BlocProvider(
+          create: (context) => MessageBloc(
+            apiService: ApiService(),
+            chatId: widget.chatId,
+          )..loadMessages(),
+          child: Column(
+            children: [
+              Expanded(
+                child: BlocBuilder<MessageBloc, List<Message>>(
+                  builder: (context, messages) {
+                    print('Обновление списка сообщений: ${messages.length} шт.');
 
-                  // Прокручиваем список вниз после обновления сообщений
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (_scrollController.hasClients) {
-                      _scrollController.animateTo(
-                        _scrollController.position.maxScrollExtent,
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.easeOut,
-                      );
-                    }
-                  });
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _scrollToBottom();
+                    });
 
-                  return ListView.builder(
-                    controller: _scrollController, // Добавляем контроллер
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      final message = messages[index];
-                      return MessageBubble(message: message);
-                    },
-                  );
-                },
+                    return ListView.builder(
+                      controller: _scrollController,
+                      padding: EdgeInsets.only(bottom: 80.0),
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        final message = messages[index];
+                        return MessageBubble(
+                          message: message,
+                          isMe: _currentUserId == message.senderId,
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
-            ),
-            _MessageInput(chatId: widget.chatId),
-          ],
+              _MessageInput(chatId: widget.chatId),
+            ],
+          ),
         ),
       ),
     );
@@ -91,31 +101,40 @@ class _MessageInput extends StatelessWidget {
     final messageBloc = BlocProvider.of<MessageBloc>(context);
     final textController = TextEditingController();
 
-    return Container(
-      padding: EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: textController,
-              decoration: InputDecoration(
-                hintText: 'Введите сообщение...',
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final inputHeight = constraints.maxHeight; // Высота поля ввода
+        return Container(
+          padding: EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            color: Colors.grey[200], // Фон поля ввода
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: textController,
+                  decoration: InputDecoration(
+                    hintText: 'Введите сообщение...',
+                    border: InputBorder.none,
+                  ),
+                ),
               ),
-            ),
+              IconButton(
+                icon: Icon(Icons.send),
+                onPressed: () {
+                  final message = textController.text;
+                  if (message.isNotEmpty) {
+                    print('Пользователь нажал кнопку отправки сообщения: $message');
+                    messageBloc.sendMessage(message);
+                    textController.clear();
+                  }
+                },
+              ),
+            ],
           ),
-          IconButton(
-            icon: Icon(Icons.send),
-            onPressed: () {
-              final message = textController.text;
-              if (message.isNotEmpty) {
-                print('Пользователь нажал кнопку отправки сообщения: $message');
-                messageBloc.sendMessage(message);
-                textController.clear();
-              }
-            },
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

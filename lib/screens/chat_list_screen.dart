@@ -4,7 +4,6 @@ import '../blocs/chat_bloc.dart';
 import '../models/chat.dart';
 import '../services/api_service.dart';
 import '../widgets/chat_item.dart';
-import 'chat_detail_screen.dart';
 
 class ChatListScreen extends StatelessWidget {
   @override

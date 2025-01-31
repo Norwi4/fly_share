@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/chat.dart';
 import '../screens/chat_detail_screen.dart';
 
@@ -6,6 +7,12 @@ class ChatItem extends StatelessWidget {
   final Chat chat;
 
   ChatItem({required this.chat});
+
+  String _formatTime(String sentAt) {
+    final dateTime = DateTime.parse(sentAt); // Преобразуем строку в DateTime
+    final formattedTime = DateFormat('HH:mm').format(dateTime); // Форматируем время
+    return formattedTime;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +28,7 @@ class ChatItem extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       trailing: Text(
-        '12:34', // Здесь можно добавить время последнего сообщения, если оно есть
+        _formatTime(chat.lastMessageSentAt),
         style: TextStyle(color: Colors.grey),
       ),
       onTap: () {

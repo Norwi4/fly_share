@@ -2,6 +2,7 @@ import 'dart:convert'; // Импортируем для работы с JSON
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http; // Импортируем пакет http
+import 'decoder.dart';
 import 'home_screen.dart';
 
 class CodeVerificationScreen extends StatefulWidget {
@@ -51,9 +52,23 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
       // Выводим токен в консоль
       print('Token: $token');
 
+      final payload = JwtDecoder.decode(token);
+
+      print("--------------------------------------");
+      print('payload: $payload');
+      print("--------------------------------------");
+      final userId = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+
+      print("--------------------------------------");
+      print("--------------------------------------");
+      print("--------------------------------------");
+      print('userId: $userId');
+      print("--------------------------------------");
+
       // Сохранение токена в SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', token);
+      await prefs.setString('userId', userId);
 
       // Переход на главный экран и удаление всех предыдущих экранов из стека
       Navigator.of(context).pushAndRemoveUntil(

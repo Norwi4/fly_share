@@ -10,11 +10,11 @@ class WebSocketService {
   Future<void> sendMessage(String chatId, String message) async {
     final connection = HubConnectionBuilder()
         .withUrl(
-      'http://212.109.196.24:5045/chathub',
-      options: HttpConnectionOptions(
-        accessTokenFactory: () async => this.token,
-      ),
-    )
+          'http://212.109.196.24:5045/chathub',
+          options: HttpConnectionOptions(
+            accessTokenFactory: () async => this.token,
+          ),
+        )
         .build();
 
     try {
@@ -33,4 +33,3 @@ class WebSocketService {
     }
   }
 }
-
